@@ -4,7 +4,8 @@ from ..models import Book, Comment
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ("book",)
 
 
 class BookSerializer(serializers.ModelSerializer):

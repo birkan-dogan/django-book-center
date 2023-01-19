@@ -26,6 +26,7 @@ from ..models import Book, Comment
 from .serializers import CommentSerializer, BookSerializer
 
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
 class BookListCreateAPIView(generics.ListCreateAPIView):
     queryset = Book.objects.all()
@@ -35,3 +36,18 @@ class BookListCreateAPIView(generics.ListCreateAPIView):
 class BookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+
+class CommentCreateAPIView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        book_pk = self.kwargs.get("book_pk")
+        # kitabımızın primary key parametresini `self.kwargs.get()` sayesinde çektik
+        book = get_object_or_404(Book, pk = book_pk)
+        serializer.save(book = book)
+
+
+class CommentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
