@@ -30,7 +30,7 @@ from rest_framework.generics import get_object_or_404
 
 # Permissions
 from rest_framework import permissions
-from .permissions import IsAdminUserOrReadOnly  # custom permission
+from .permissions import IsAdminUserOrReadOnly, IsUserOrReadOnly  # custom permission
 from rest_framework.exceptions import ValidationError  # to warn the user that can't comment second times
 
 class BookListCreateAPIView(generics.ListCreateAPIView):
@@ -67,3 +67,4 @@ class CommentCreateAPIView(generics.CreateAPIView):
 class CommentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [IsUserOrReadOnly]
