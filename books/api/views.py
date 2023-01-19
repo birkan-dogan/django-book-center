@@ -31,6 +31,7 @@ from rest_framework.generics import get_object_or_404
 # Permissions
 from rest_framework import permissions
 from .permissions import IsAdminUserOrReadOnly  # custom permission
+from rest_framework.exceptions import ValidationError  # to warn the user that can't comment second times
 
 class BookListCreateAPIView(generics.ListCreateAPIView):
     queryset = Book.objects.all()
@@ -47,12 +48,20 @@ class BookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class CommentCreateAPIView(generics.CreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         book_pk = self.kwargs.get("book_pk")
         # kitabımızın primary key parametresini `self.kwargs.get()` sayesinde çektik
         book = get_object_or_404(Book, pk = book_pk)
-        serializer.save(book = book)
+        user = self.request.user
+
+        # 1 user 1 kitaba sadece 1 yorum yapabilir
+        comments = Comment.objects.filter(book = book, user = user)
+        if(comments.exists()):
+            raise ValidationError("You can comment just one time for the same book")
+
+        serializer.save(book = book, user = user)
 
 
 class CommentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
