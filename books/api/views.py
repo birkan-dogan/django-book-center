@@ -28,14 +28,21 @@ from .serializers import CommentSerializer, BookSerializer
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+# Permissions
+from rest_framework import permissions
+from .permissions import IsAdminUserOrReadOnly  # custom permission
+
 class BookListCreateAPIView(generics.ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    # permission_classes = [permissions.IsAuthenticated] -->  local permission
+    permission_classes = [IsAdminUserOrReadOnly]  # custom permission
 
 
 class BookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAdminUserOrReadOnly]  # custom permission
 
 class CommentCreateAPIView(generics.CreateAPIView):
     queryset = Comment.objects.all()
